@@ -1,19 +1,19 @@
-export function createRouter(initialRoutes: Record<string, () => HTMLElement>) {
-  const routes = initialRoutes;
+import { render } from './framework.ts';
+export type Routes = Record<string, () => Element>;
 
+let routes: Routes | null = null;
+
+export function createRouter(initialRoutes: Routes) {
+  routes = initialRoutes;
   window.addEventListener('hashchange', () => handleRouteChange());
   handleRouteChange();
 
   function handleRouteChange() {
     const currentPath = window.location.hash.slice(1);
-    const route = routes[currentPath];
+    const route = routes ? routes[currentPath] : null;
     if (route) {
-      route();
-    } else {
-      routes['/404']();
+      render();
     }
   }
-  return {
-    handleRouteChange,
-  };
 }
+export { routes };

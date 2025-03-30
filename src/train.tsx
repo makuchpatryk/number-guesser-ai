@@ -15,7 +15,7 @@ const state = reactive({
 let activeMouse: boolean | null = null;
 const { save } = createRepository();
 
-export default () => {
+export default function Train() {
   function onGridClick(x: number, y: number, value: boolean) {
     state.grid[x][y] = value;
   }
@@ -79,4 +79,4 @@ export default () => {
       </section>
     </div>
   );
-};
+}

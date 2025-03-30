@@ -2,6 +2,9 @@ export type Component = () => Element;
 
 let app: Element | null = null;
 let globalComponent: Component | null = null;
+function setGlobalComponent(component: Component) {
+  globalComponent = component;
+}
 
 export function createElement(
   elementTag: Component | string,
@@ -37,9 +40,8 @@ export function createApp(component: Component) {
       if (el) {
         app = el;
         el.appendChild(component());
-        globalComponent = component;
+        setGlobalComponent(component);
       }
-      console.log('app', app);
     },
   };
 }

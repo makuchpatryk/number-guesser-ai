@@ -1,6 +1,14 @@
 import { createElement } from './framework';
-import Train from './train.tsx';
+import RouteView from './framework/route-view.tsx';
 
 export default () => {
-  return <Train />;
+  return (
+    <div>
+      <div>
+        <a href="#/">Train</a>
+        <a href="#/checker">Checker</a>
+      </div>
+      <RouteView />
+    </div>
+  );
 };

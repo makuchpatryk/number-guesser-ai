@@ -1,3 +1,6 @@
+import { runMountedHooks, setCurrentElement } from './lifehooks.ts';
+import { effect } from './reactive.ts';
+
 export type Component = () => Element;
 
 let app: Element | null = null;
@@ -7,48 +10,53 @@ function setGlobalComponent(component: Component) {
 }
 
 export function createElement(
-  elementTag: Component | string,
+  tag: any,
   props: any,
   ...children: any[]
-): Element {
-  if (typeof elementTag === 'function') {
-    return elementTag();
+): HTMLElement {
+  props = props || {};
+  children = children.flat();
+
+  // Handle functional components
+  if (typeof tag === 'function') {
+    return tag({ ...props, children });
   }
 
-  const element = document.createElement(elementTag);
-  for (const key in props) {
+  // Handle native HTML elements (e.g., 'div', 'button')
+  const el = document.createElement(tag);
+
+  // Set props like event listeners and attributes
+  for (const [key, value] of Object.entries(props)) {
     if (key.startsWith('on')) {
-      element.addEventListener(key.substring(2).toLowerCase(), props[key]);
+      el.addEventListener(key.slice(2).toLowerCase(), value);
     } else {
-      element.setAttribute(key, props[key]);
+      (el as any)[key] = value;
     }
   }
-  children.flat().forEach((child) => {
-    if (typeof child === 'string' || typeof child === 'number') {
-      element.appendChild(document.createTextNode(child.toString()));
-    } else if (child instanceof Node) {
-      element.appendChild(child);
+
+  // Append children to the element
+  for (const child of children) {
+    el.appendChild(
+      child instanceof Node ? child : document.createTextNode(String(child)),
+    );
+  }
+
+  return el;
+}
+
+export function mount(Component: () => Element, container: HTMLElement) {
+  let prevVNode: HTMLElement | null = null;
+
+  effect(() => {
+    if (prevVNode) {
+      container.removeChild(prevVNode);
     }
+
+    const el = Component();
+    prevVNode = el as HTMLElement;
+    setCurrentElement(el);
+    container.appendChild(el);
+
+    runMountedHooks(el);
   });
-  return element;
-}
-
-export function createApp(component: Component) {
-  return {
-    mount(selector: string) {
-      const el = document.querySelector(selector);
-      if (el) {
-        app = el;
-        el.appendChild(component());
-        setGlobalComponent(component);
-      }
-    },
-  };
-}
-
-export function render() {
-  if (app && globalComponent) {
-    app.innerHTML = '';
-    app.appendChild(globalComponent());
-  }
 }

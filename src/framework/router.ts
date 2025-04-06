@@ -1,4 +1,6 @@
-import { render } from './framework.ts';
+import App from '../app.tsx';
+import { mount } from './framework.ts';
+
 export type Routes = Record<string, () => Element>;
 
 let routes: Routes | null = null;
@@ -12,7 +14,7 @@ export function createRouter(initialRoutes: Routes) {
     const currentPath = window.location.hash.slice(1);
     const route = routes ? routes[currentPath] : null;
     if (route) {
-      render();
+      mount(route, document.getElementById('app')!);
     }
   }
 }

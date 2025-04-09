@@ -19,6 +19,8 @@ const state = reactive({
 });
 let activeMouse: boolean | null = null;
 const { update, save, get } = createRepository();
+result = get();
+
 export default function Train() {
   function onGridClick(x: number, y: number, value: boolean) {
     state.grid[x][y] = value;
@@ -34,13 +36,6 @@ export default function Train() {
     state.grid = getInitialGrid();
     update(newRow);
   }
-
-  onMounted(() => {
-    console.log('update', result, get());
-    const tt = get();
-    if (tt) result = tt;
-    console.log('update', result);
-  });
 
   return (
     <div>

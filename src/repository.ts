@@ -1,7 +1,7 @@
 export interface Repository {
   save(filename: string, data: BlobPart): void;
   update(row: any): void;
-  get(): any[] | null;
+  get(): ResultItem[] | null;
 }
 export function createRepository(): Repository {
   function get() {

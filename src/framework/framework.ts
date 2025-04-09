@@ -1,14 +1,6 @@
 import { runMountedHooks, setCurrentElement } from './lifehooks.ts';
 import { effect } from './reactive.ts';
 
-export type Component = () => Element;
-
-let app: Element | null = null;
-let globalComponent: Component | null = null;
-function setGlobalComponent(component: Component) {
-  globalComponent = component;
-}
-
 export function createElement(
   tag: any,
   props: any,
@@ -22,10 +14,8 @@ export function createElement(
     return tag({ ...props, children });
   }
 
-  // Handle native HTML elements (e.g., 'div', 'button')
   const el = document.createElement(tag);
 
-  // Set props like event listeners and attributes
   for (const [key, value] of Object.entries(props)) {
     if (key.startsWith('on')) {
       el.addEventListener(key.slice(2).toLowerCase(), value);

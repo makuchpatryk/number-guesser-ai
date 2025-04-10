@@ -1,7 +1,6 @@
 import { createElement, reactive } from './framework';
-import { onMounted } from './framework/lifehooks.ts';
 import { createRepository } from './repository.ts';
-interface ResultItem {
+export interface ResultItem {
   list: number[];
   result: number;
 }
@@ -39,14 +38,14 @@ export default function Train() {
 
   return (
     <div>
-      <h1>Train</h1>
-      <section className="panel">
-        <div className="canvas" onmouseleave={() => (activeMouse = null)}>
+      <h1 className="p-5 text-3xl font-extrabold">Train</h1>
+      <section className="grid grid-cols-2 gap-2">
+        <div className="m-[10px]" onmouseleave={() => (activeMouse = null)}>
           {state.grid.map((row, keyRow) => (
-            <div className="row">
+            <div className="flex max-w-[500px]">
               {row.map((col, keyCol) => (
                 <div
-                  className={`col ${col ? 'active' : ''}`}
+                  className={`w-[100px] h-[100px] block m-[5px] ${col ? 'bg-[red]' : 'bg-white'}`}
                   onmouseover={() => {
                     activeMouse !== null
                       ? onGridClick(keyRow, keyCol, activeMouse)
@@ -65,34 +64,42 @@ export default function Train() {
             </div>
           ))}
         </div>
-        <div className="numbers">
+        <div className="flex gap-[5px] w-full flex-wrap m-[10px] size-fit">
           {state.buttons.map((num) => (
-            <button type="button" onclick={() => setTrain(num)}>
+            <button
+              className="w-[100px] h-[100px] block m-[3px] bg-[#aaaaaa] hover:bg-[#999999] cursor-pointer"
+              type="button"
+              onclick={() => setTrain(num)}
+            >
               {num}
             </button>
           ))}
         </div>
-
-        <div className="actions">
+        <div>
           <button
+            className="px-2 py-1 bg-[#aaaaaa] hover:bg-[#999999] m-1 cursor-pointer"
             type="button"
             onclick={() => save('data.txt', JSON.stringify(result))}
           >
             Save to train
           </button>
-          <button id="guess" type="button">
+          <button
+            className="px-2 py-1 bg-[#aaaaaa] hover:bg-[#999999] m-1 cursor-pointer"
+            id="guess"
+            type="button"
+          >
             <a href="./guesser.html">Guess</a>
           </button>
         </div>
-        <div className="result-container flex">
-          <div className="row">
-            <div className="list">Pattern</div>{' '}
-            <div className="result">Result</div>
+        <div>
+          <div className="grid grid-cols-2 gap-2 w-full items-center my-[10px]">
+            <div className="font-extrabold">Pattern</div>{' '}
+            <div className="font-extrabold ml-[5px]">Result</div>
           </div>
           {result.map((it) => (
-            <div className="row">
-              <div className="list">{it.list}</div>{' '}
-              <div className="result">{it.result}</div>
+            <div className="grid grid-cols-2 gap-2 w-full items-center my-[5px]">
+              <div className="font-extrabold">{it.list}</div>{' '}
+              <div className="ml-[5px]">{it.result}</div>
             </div>
           ))}
         </div>

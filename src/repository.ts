@@ -1,12 +1,14 @@
+import { ResultItem } from './train.tsx';
+
 export interface Repository {
   save(filename: string, data: BlobPart): void;
   update(row: any): void;
-  get(): ResultItem[] | null;
+  get(): ResultItem[];
 }
 export function createRepository(): Repository {
   function get() {
     const data = localStorage.getItem('result');
-    return data ? (JSON.parse(data) as any[]) : null;
+    return data ? (JSON.parse(data) as any[]) : [];
   }
   return {
     save(filename: string, data: BlobPart) {

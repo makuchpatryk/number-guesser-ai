@@ -1,31 +1,26 @@
-import { createElement, reactive } from './framework';
-import { createRepository } from './repository.ts';
+import { createElement, reactive } from '../../libs/framework';
+import { createRepository } from '../repository.ts';
+import { getInitialGrid, Grid } from '../shared';
 export interface ResultItem {
   list: number[];
   result: number;
 }
 let result = reactive<ResultItem[]>([]);
-const getInitialGrid = () => [
-  [false, false, false, false, false],
-  [false, false, false, false, false],
-  [false, false, false, false, false],
-  [false, false, false, false, false],
-  [false, false, false, false, false],
-];
-const state = reactive({
-  grid: getInitialGrid(),
+
+const state = reactive<{
+  buttons: number[];
+  grid: boolean[][];
+  result: ResultItem[];
+}>({
   buttons: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  grid: getInitialGrid(),
+  result: [],
 });
-let activeMouse: boolean | null = null;
+
 const { update, save, get } = createRepository();
 result = get();
 
 export default function Train() {
-  function onGridClick(x: number, y: number, value: boolean) {
-    state.grid[x][y] = value;
-    console.log('onGridClick', state.grid);
-  }
-
   function setTrain(num: number) {
     const newRow = {
       list: state.grid.flat().map((it) => +it),
@@ -40,30 +35,7 @@ export default function Train() {
     <div>
       <h1 className="p-5 text-3xl font-extrabold">Train</h1>
       <section className="grid grid-cols-2 gap-2">
-        <div className="m-[10px]" onmouseleave={() => (activeMouse = null)}>
-          {state.grid.map((row, keyRow) => (
-            <div className="flex max-w-[500px]">
-              {row.map((col, keyCol) => (
-                <div
-                  className={`w-[100px] h-[100px] block m-[5px] ${col ? 'bg-[red]' : 'bg-white'}`}
-                  onmouseover={() => {
-                    activeMouse !== null
-                      ? onGridClick(keyRow, keyCol, activeMouse)
-                      : null;
-                  }}
-                  onmousedown={() => {
-                    activeMouse = !state.grid[keyRow][keyCol];
-                    onGridClick(keyRow, keyCol, activeMouse);
-                  }}
-                  onmouseup={() => (activeMouse = null)}
-                  onclick={() =>
-                    onGridClick(keyRow, keyCol, !state.grid[keyRow][keyCol])
-                  }
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+        <Grid grid={state.grid} />
         <div className="flex gap-[5px] w-full flex-wrap m-[10px] size-fit">
           {state.buttons.map((num) => (
             <button

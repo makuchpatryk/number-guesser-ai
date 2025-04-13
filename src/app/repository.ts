@@ -1,4 +1,4 @@
-import { ResultItem } from './train.tsx';
+import { ResultItem } from './train/train.tsx';
 
 export interface Repository {
   save(filename: string, data: BlobPart): void;

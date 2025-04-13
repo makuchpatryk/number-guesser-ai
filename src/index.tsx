@@ -1,7 +1,6 @@
-import Checker from './checker.tsx';
-import { createElement } from './framework';
-import { RouteView } from './framework/route-view.tsx';
-import Train from './train.tsx';
+import Checker from './app/checker/checker.tsx';
+import { createElement, RouteView } from './libs/framework';
+import Train from './app/train/train.tsx';
 
 export default () => {
   return (

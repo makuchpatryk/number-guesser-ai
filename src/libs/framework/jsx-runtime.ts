@@ -1,6 +1,3 @@
-import { runMountedHooks, setCurrentElement } from './lifehooks.ts';
-import { effect } from './reactive.ts';
-
 export function createElement(
   tag: any,
   props: any,
@@ -32,21 +29,4 @@ export function createElement(
   }
 
   return el;
-}
-
-export function mount(Component: () => Element, container: HTMLElement) {
-  let prevVNode: HTMLElement | null = null;
-
-  effect(() => {
-    if (prevVNode) {
-      container.removeChild(prevVNode);
-    }
-
-    const el = Component();
-    prevVNode = el as HTMLElement;
-    setCurrentElement(el);
-    container.appendChild(el);
-
-    runMountedHooks(el);
-  });
 }

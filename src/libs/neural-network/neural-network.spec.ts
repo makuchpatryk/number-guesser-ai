@@ -1,8 +1,8 @@
 import { expect, describe, beforeAll, it } from 'vitest';
-import { neuralNetworkFactory } from './neural-network.ts';
+import { NeuralNetwork, defaultTrainingConfig } from './neural-network.ts';
 
 describe('NeuralNetwork XOR Test', () => {
-  const nn = neuralNetworkFactory();
+  const nn = new NeuralNetwork(9, 10);
   const data = [
     { input: [0, 1, 0, 0, 1, 0, 0, 1, 0], target: 1 },
     { input: [1, 1, 1, 1, 0, 1, 1, 1, 1], target: 0 },
@@ -26,7 +26,11 @@ describe('NeuralNetwork XOR Test', () => {
   ];
 
   beforeAll(() => {
-    nn.train(data);
+    nn.train(
+      data.map((d) => d.input),
+      data.map((d) => d.target),
+      defaultTrainingConfig,
+    );
   });
 
   it('should output ~0', () => {
@@ -52,6 +56,7 @@ describe('NeuralNetwork XOR Test', () => {
     console.log('output', output);
     expect(output).toBeLessThan(9.2);
   });
+
   it('should output ~3', () => {
     const output = nn.predict([1, 1, 0, 0, 1, 0, 1, 1, 0]);
     console.log('output', output);

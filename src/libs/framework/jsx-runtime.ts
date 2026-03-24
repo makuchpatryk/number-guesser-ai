@@ -16,6 +16,8 @@ export function createElement(
   for (const [key, value] of Object.entries(props)) {
     if (key.startsWith('on')) {
       el.addEventListener(key.slice(2).toLowerCase(), value);
+    } else if (key.startsWith('data-') || key.startsWith('aria-')) {
+      el.setAttribute(key, String(value));
     } else {
       (el as any)[key] = value;
     }

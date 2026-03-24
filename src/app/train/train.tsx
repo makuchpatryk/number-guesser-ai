@@ -1,7 +1,7 @@
 import { createElement } from '../../libs/framework';
 import { Grid } from '../shared';
 import { Result } from '../shared/result/result.tsx';
-import { trainState, result, setTrain, saveToFile } from './train.service';
+import { trainState, result, setTrain, saveToFile, removeItem, clearAll } from './train.service';
 
 export default function Train() {
   return (
@@ -35,7 +35,7 @@ export default function Train() {
             Go to Checker
           </a>
         </div>
-        <Result result={result} />
+        <Result result={result} onDelete={removeItem} onClearAll={clearAll} />
       </section>
     </div>
   );

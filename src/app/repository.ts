@@ -1,19 +1,24 @@
+import { StorageAdapter } from '../libs/storage/storage.adapter';
 import { ResultItem } from './shared/models/result-item.model';
+
+const RESULT_KEY = 'result';
 
 export interface Repository {
   save(filename: string, data: BlobPart): void;
-  update(row: ResultItem): void;
-  get(): ResultItem[];
+  update(row: ResultItem): Promise<void>;
+  remove(index: number): Promise<void>;
+  clear(): Promise<void>;
+  get(): Promise<ResultItem[]>;
 }
 
-export function createRepository(): Repository {
-  function get(): ResultItem[] {
+export function createRepository(adapter: StorageAdapter): Repository {
+  async function get(): Promise<ResultItem[]> {
     try {
-      const data = localStorage.getItem('result');
+      const data = await adapter.getItem(RESULT_KEY);
       return data ? (JSON.parse(data) as ResultItem[]) : [];
     } catch {
-      console.warn('[Repository] Failed to parse localStorage data, resetting.');
-      localStorage.removeItem('result');
+      console.warn('[Repository] Failed to parse stored data, resetting.');
+      await adapter.removeItem(RESULT_KEY);
       return [];
     }
   }
@@ -29,9 +34,17 @@ export function createRepository(): Repository {
       document.body.removeChild(a);
     },
     get,
-    update(row: ResultItem) {
-      const existing = get();
-      localStorage.setItem('result', JSON.stringify([...existing, row]));
+    async update(row: ResultItem): Promise<void> {
+      const existing = await get();
+      await adapter.setItem(RESULT_KEY, JSON.stringify([...existing, row]));
+    },
+    async remove(index: number): Promise<void> {
+      const existing = await get();
+      existing.splice(index, 1);
+      await adapter.setItem(RESULT_KEY, JSON.stringify(existing));
+    },
+    async clear(): Promise<void> {
+      await adapter.removeItem(RESULT_KEY);
     },
   };
 }

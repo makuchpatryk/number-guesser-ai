@@ -1,9 +1,10 @@
 import { reactive } from '../../libs/framework';
+import { localStorageAdapter } from '../../libs/storage';
 import { createRepository } from '../repository';
 import { ResultItem } from '../shared/models/result-item.model';
 import { getInitialGrid } from '../shared';
 
-const { update, save, get } = createRepository();
+const { update, save, get, remove, clear } = createRepository(localStorageAdapter);
 
 export const trainState = reactive<{
   buttons: number[];
@@ -15,20 +16,33 @@ export const trainState = reactive<{
 
 export const result = reactive<ResultItem[]>([]);
 
-// Inicjalizacja — dane z localStorage wpadają DO reactive proxy (nie zastępują go)
-get().forEach((item) => result.push(item));
+// Async init — dane z localStorage wpadają DO reactive proxy
+(async () => {
+  const items = await get();
+  items.forEach((item) => result.push(item));
+})();
 
-export function setTrain(num: number) {
+export async function setTrain(num: number): Promise<void> {
   const newRow: ResultItem = {
     input: trainState.grid.flat().map((it) => +it),
     target: num,
   };
   result.push(newRow);
   trainState.grid = getInitialGrid();
-  update(newRow);
+  await update(newRow);
 }
 
-export function saveToFile() {
+export function saveToFile(): void {
   save('data.txt', JSON.stringify(result));
+}
+
+export async function removeItem(index: number): Promise<void> {
+  result.splice(index, 1);
+  await remove(index);
+}
+
+export async function clearAll(): Promise<void> {
+  result.splice(0, result.length);
+  await clear();
 }
 

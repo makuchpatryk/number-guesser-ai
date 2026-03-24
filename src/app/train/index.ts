@@ -1,1 +1,1 @@
-export * from './train.tsx';
+export { default } from './train.tsx';

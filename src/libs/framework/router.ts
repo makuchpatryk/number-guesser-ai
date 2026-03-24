@@ -1,15 +1,14 @@
-// router.js
 import { reactive } from './reactive.ts';
 
 export const router = reactive({
-  path: window.location.pathname,
+  path: window.location.hash.slice(1) || '/',
 });
 
 export function navigate(path: string) {
-  history.pushState({}, '', path);
-  router.path = path;
+  window.location.hash = path;
+  // hashchange event zaktualizuje router.path automatycznie
 }
 
 window.addEventListener('hashchange', () => {
-  router.path = window.location.hash.slice(1);
+  router.path = window.location.hash.slice(1) || '/';
 });

@@ -88,7 +88,6 @@ class NeuralNetwork {
 
 export function neuralNetworkFactory() {
   const nn = new NeuralNetwork(9, 10);
-  let isTrained = false;
   return {
     train(data: { input: number[]; target: number }[]) {
       const inputs: number[][] = [];
@@ -99,10 +98,8 @@ export function neuralNetworkFactory() {
         targets.push(it.target);
       });
       nn.train(inputs, targets, 300000);
-      isTrained = true;
     },
     predict(input: number[]) {
-      console.log('nn.predict(input)', isTrained, nn.predict(input));
       return nn.predict(input);
     },
   };

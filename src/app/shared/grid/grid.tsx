@@ -1,10 +1,5 @@
 import { createElement } from '../../../libs/framework';
 
-export const getInitialGrid = () => [
-  [false, false, false],
-  [false, false, false],
-  [false, false, false],
-];
 
 let activeMouse: boolean | null = null;
 

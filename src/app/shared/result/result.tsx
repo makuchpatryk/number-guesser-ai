@@ -1,5 +1,5 @@
 import { createElement } from '../../../libs/framework';
-import { ResultItem } from '../../train';
+import { ResultItem } from '../models/result-item.model';
 
 export function Result({ result }: { result: ResultItem[] }) {
   return (

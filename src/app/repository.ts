@@ -1,15 +1,23 @@
-import { ResultItem } from './train/train.tsx';
+import { ResultItem } from './shared/models/result-item.model';
 
 export interface Repository {
   save(filename: string, data: BlobPart): void;
-  update(row: any): void;
+  update(row: ResultItem): void;
   get(): ResultItem[];
 }
+
 export function createRepository(): Repository {
-  function get() {
-    const data = localStorage.getItem('result');
-    return data ? (JSON.parse(data) as any[]) : [];
+  function get(): ResultItem[] {
+    try {
+      const data = localStorage.getItem('result');
+      return data ? (JSON.parse(data) as ResultItem[]) : [];
+    } catch {
+      console.warn('[Repository] Failed to parse localStorage data, resetting.');
+      localStorage.removeItem('result');
+      return [];
+    }
   }
+
   return {
     save(filename: string, data: BlobPart) {
       const blob = new Blob([data], { type: 'text/plain' });
@@ -21,12 +29,9 @@ export function createRepository(): Repository {
       document.body.removeChild(a);
     },
     get,
-    update(row: any[]) {
-      const existRow = get();
-      localStorage.setItem(
-        'result',
-        JSON.stringify([...(existRow || []), row]),
-      );
+    update(row: ResultItem) {
+      const existing = get();
+      localStorage.setItem('result', JSON.stringify([...existing, row]));
     },
   };
 }

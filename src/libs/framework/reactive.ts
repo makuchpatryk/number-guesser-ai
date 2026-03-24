@@ -51,7 +51,6 @@ export function reactive<T extends object>(obj: T): T {
 }
 
 export function effect(fn: Effect) {
-  console.log('effect', activeEffect);
   function wrappedEffect() {
     activeEffect = wrappedEffect;
     fn();

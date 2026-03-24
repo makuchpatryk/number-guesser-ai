@@ -12,15 +12,19 @@ export function Grid({ grid }: { grid: boolean[][] }) {
     grid[x][y] = value;
   }
   return (
-    <div className="m-[10px]">
+    <div className="select-none">
       {grid.map((row, keyRow) => (
-        <div className="flex max-w-[500px]">
+        <div className="flex">
           {row.map((col, keyCol) => (
             <div
               data-testid="grid-cell"
               data-row={keyRow}
               data-col={keyCol}
-              className={`w-[100px] h-[100px] block m-[5px] ${col ? 'bg-[red]' : 'bg-white'}`}
+              className={`w-[96px] h-[96px] m-[4px] rounded-lg border-2 cursor-crosshair transition-colors ${
+                col
+                  ? 'bg-[red] border-red-700'
+                  : 'bg-zinc-100 border-zinc-300 hover:bg-zinc-200'
+              }`}
               onmouseenter={() => {
                 if (activeMouse !== null) {
                   onGridClick(keyRow, keyCol, activeMouse);

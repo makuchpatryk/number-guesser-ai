@@ -1,9 +1,10 @@
 import { createElement, reactive } from '../../libs/framework';
 import { createRepository } from '../repository.ts';
 import { getInitialGrid, Grid } from '../shared';
+import { Result } from '../shared/result/result.tsx';
 export interface ResultItem {
-  list: number[];
-  result: number;
+  input: number[];
+  target: number;
 }
 let result = reactive<ResultItem[]>([]);
 
@@ -23,8 +24,8 @@ result = get();
 export default function Train() {
   function setTrain(num: number) {
     const newRow = {
-      list: state.grid.flat().map((it) => +it),
-      result: num,
+      input: state.grid.flat().map((it) => +it),
+      target: num,
     };
     result.push(newRow);
     state.grid = getInitialGrid();
@@ -63,18 +64,7 @@ export default function Train() {
             <a href="./guesser.html">Guess</a>
           </button>
         </div>
-        <div>
-          <div className="grid grid-cols-2 gap-2 w-full items-center my-[10px]">
-            <div className="font-extrabold">Pattern</div>{' '}
-            <div className="font-extrabold ml-[5px]">Result</div>
-          </div>
-          {result.map((it) => (
-            <div className="grid grid-cols-2 gap-2 w-full items-center my-[5px]">
-              <div className="font-extrabold">{it.list}</div>{' '}
-              <div className="ml-[5px]">{it.result}</div>
-            </div>
-          ))}
-        </div>
+        <Result result={result} />
       </section>
     </div>
   );

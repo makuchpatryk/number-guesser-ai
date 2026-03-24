@@ -27,7 +27,6 @@ export function createRepository(): Repository {
         'result',
         JSON.stringify([...(existRow || []), row]),
       );
-      console.log('localStorage', localStorage);
     },
   };
 }

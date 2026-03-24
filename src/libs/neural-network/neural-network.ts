@@ -1,107 +1,109 @@
-export class NeuralNetwork {
-  private weightsInputHidden: number[][];
-  private weightsHiddenOutput: number[];
-  private biasHidden: number[];
-  private biasOutput: number;
-  private readonly learningRate: number;
+function sigmoid(x: number): number {
+  return 1 / (1 + Math.exp(-x));
+}
 
-  constructor(
-    inputSize: number,
-    hiddenSize: number,
-    _outputSize: number,
-    learningRate: number = 0.1,
-  ) {
-    this.learningRate = learningRate;
+function sigmoidDerivative(x: number): number {
+  return x * (1 - x);
+}
 
-    this.weightsInputHidden = Array.from({ length: hiddenSize }, () =>
-      Array.from({ length: inputSize }, () => Math.random() * 2 - 1),
+function dot(a: number[], b: number[]): number {
+  return a.reduce((sum, ai, i) => sum + ai * b[i], 0);
+}
+
+function addBias(inputs: number[]): number[] {
+  return [...inputs, 1]; // bias neuron
+}
+
+class NeuralNetwork {
+  inputSize: number;
+  hiddenSize: number;
+  outputSize: number;
+
+  weightsInputHidden: number[][];
+  weightsHiddenOutput: number[];
+
+  constructor(inputSize: number, hiddenSize: number) {
+    this.inputSize = inputSize + 1; // +1 for bias
+    this.hiddenSize = hiddenSize;
+    this.outputSize = 1;
+
+    this.weightsInputHidden = Array.from({ length: this.hiddenSize }, () =>
+      Array.from({ length: this.inputSize }, () => Math.random() * 2 - 1),
     );
 
     this.weightsHiddenOutput = Array.from(
-      { length: hiddenSize },
+      { length: this.hiddenSize + 1 },
       () => Math.random() * 2 - 1,
     );
+  }
 
-    this.biasHidden = Array.from(
-      { length: hiddenSize },
-      () => Math.random() * 2 - 1,
+  predict(input: number[]): number {
+    const inputWithBias = addBias(input);
+    const hidden = this.weightsInputHidden.map((weights) =>
+      sigmoid(dot(weights, inputWithBias)),
     );
-    this.biasOutput = Math.random() * 2 - 1;
+    const hiddenWithBias = addBias(hidden);
+    const output = sigmoid(dot(this.weightsHiddenOutput, hiddenWithBias));
+    return output * 9; // scale back to 0-9
   }
 
-  private sigmoid(x: number): number {
-    return 1 / (1 + Math.exp(-x));
-  }
-
-  private sigmoidDerivative(x: number): number {
-    return x * (1 - x);
-  }
-
-  forward(input: number[]): { hidden: number[]; output: number } {
-    const hidden = this.weightsInputHidden.map((weights, i) => {
-      const sum =
-        weights.reduce((acc, w, j) => acc + w * input[j], 0) +
-        this.biasHidden[i];
-      return this.sigmoid(sum);
-    });
-
-    const outputSum =
-      hidden.reduce((acc, h, i) => acc + h * this.weightsHiddenOutput[i], 0) +
-      this.biasOutput;
-
-    const output = this.sigmoid(outputSum);
-
-    return { hidden, output };
-  }
-
-  train(inputs: number[][], targets: number[], epochs: number = 10000): void {
+  train(inputs: number[][], targets: number[], epochs = 10000, lr = 0.1) {
     for (let epoch = 0; epoch < epochs; epoch++) {
-      inputs.forEach((input, idx) => {
-        const target = targets[idx];
+      inputs.forEach((input, i) => {
+        const target = targets[i] / 9; // normalize target
 
-        const { hidden, output } = this.forward(input);
+        const inputWithBias = addBias(input);
+        const hidden = this.weightsInputHidden.map((weights) =>
+          sigmoid(dot(weights, inputWithBias)),
+        );
+        const hiddenWithBias = addBias(hidden);
+        const output = sigmoid(dot(this.weightsHiddenOutput, hiddenWithBias));
 
         const outputError = target - output;
-        const outputDelta = outputError * this.sigmoidDerivative(output);
+        const outputDelta = outputError * sigmoidDerivative(output);
 
-        const hiddenDeltas = hidden.map((h, i) => {
-          const error = this.weightsHiddenOutput[i] * outputDelta;
-          return error * this.sigmoidDerivative(h);
-        });
+        const hiddenErrors = this.weightsHiddenOutput.map(
+          (w) => w * outputDelta,
+        );
+        const hiddenDeltas = hiddenWithBias.map(
+          (h, i) => hiddenErrors[i] * sigmoidDerivative(h),
+        );
 
-        this.weightsHiddenOutput = this.weightsHiddenOutput.map(
-          (w, i) => w + hidden[i] * outputDelta * this.learningRate,
-        );
-        this.biasOutput += outputDelta * this.learningRate;
+        // Update weights for hidden to output
+        for (let j = 0; j < this.weightsHiddenOutput.length; j++) {
+          this.weightsHiddenOutput[j] += lr * outputDelta * hiddenWithBias[j];
+        }
 
-        this.weightsInputHidden = this.weightsInputHidden.map((weights, i) =>
-          weights.map(
-            (w, j) => w + input[j] * hiddenDeltas[i] * this.learningRate,
-          ),
-        );
-        this.biasHidden = this.biasHidden.map(
-          (b, i) => b + hiddenDeltas[i] * this.learningRate,
-        );
+        // Update weights for input to hidden
+        for (let j = 0; j < this.hiddenSize; j++) {
+          for (let k = 0; k < this.inputSize; k++) {
+            this.weightsInputHidden[j][k] +=
+              lr * hiddenDeltas[j] * inputWithBias[k];
+          }
+        }
       });
     }
   }
 }
 
-const nn = new NeuralNetwork(2, 2, 1, 0.1);
+export function neuralNetworkFactory() {
+  const nn = new NeuralNetwork(9, 10);
+  let isTrained = false;
+  return {
+    train(data: { input: number[]; target: number }[]) {
+      const inputs: number[][] = [];
+      const targets: number[] = [];
 
-const inputs = [
-  [0, 0],
-  [0, 1],
-  [1, 0],
-  [1, 1],
-];
-
-const targets = [0, 1, 1, 0]; // XOR
-
-nn.train(inputs, targets, 100000);
-
-// Test
-inputs.forEach((input) => {
-  const result = nn.forward(input).output;
-  console.log(`Input: ${input} => Output: ${result.toFixed(3)}`);
-});
+      data.forEach((it) => {
+        inputs.push(it.input);
+        targets.push(it.target);
+      });
+      nn.train(inputs, targets, 300000);
+      isTrained = true;
+    },
+    predict(input: number[]) {
+      console.log('nn.predict(input)', isTrained, nn.predict(input));
+      return nn.predict(input);
+    },
+  };
+}

@@ -1,16 +1,14 @@
 import { StorageAdapter } from '../libs/storage/storage.adapter';
 import { ResultItem } from './shared/models/result-item.model';
-
 const RESULT_KEY = 'result';
-
 export interface Repository {
   save(filename: string, data: BlobPart): void;
   update(row: ResultItem): Promise<void>;
+  updateAt(index: number, row: ResultItem): Promise<void>;
   remove(index: number): Promise<void>;
   clear(): Promise<void>;
   get(): Promise<ResultItem[]>;
 }
-
 export function createRepository(adapter: StorageAdapter): Repository {
   async function get(): Promise<ResultItem[]> {
     try {
@@ -22,7 +20,6 @@ export function createRepository(adapter: StorageAdapter): Repository {
       return [];
     }
   }
-
   return {
     save(filename: string, data: BlobPart) {
       const blob = new Blob([data], { type: 'text/plain' });
@@ -37,6 +34,11 @@ export function createRepository(adapter: StorageAdapter): Repository {
     async update(row: ResultItem): Promise<void> {
       const existing = await get();
       await adapter.setItem(RESULT_KEY, JSON.stringify([...existing, row]));
+    },
+    async updateAt(index: number, row: ResultItem): Promise<void> {
+      const existing = await get();
+      existing[index] = row;
+      await adapter.setItem(RESULT_KEY, JSON.stringify(existing));
     },
     async remove(index: number): Promise<void> {
       const existing = await get();

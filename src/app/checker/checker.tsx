@@ -1,6 +1,5 @@
 import { createElement } from '../../libs/framework';
-import { Grid } from '../shared';
-import { Result } from '../shared/result/result.tsx';
+import { Grid, Result } from '../shared';
 import {
   checkerState,
   result,
@@ -15,20 +14,18 @@ import {
 export default function Checker() {
   return (
     <div className="flex flex-col gap-8">
-
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Check the Model</h1>
         <p className="text-zinc-400 mt-1 text-sm">
-          Train the model first, then draw a digit and click Recognize to test it.
+          Train the model first, then draw a digit and click Recognize to test
+          it.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-
         {/* Left — drawing + result */}
         <div className="flex flex-col gap-4">
-
           {/* Drawing card */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
             <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">
@@ -57,11 +54,13 @@ export default function Checker() {
           </div>
 
           {/* Result card */}
-          <div className={`bg-zinc-900 border rounded-xl p-6 text-center transition-colors ${
-            checkerState.guessedNumber !== null
-              ? 'border-indigo-800'
-              : 'border-zinc-800'
-          }`}>
+          <div
+            className={`bg-zinc-900 border rounded-xl p-6 text-center transition-colors ${
+              checkerState.guessedNumber !== null
+                ? 'border-indigo-800'
+                : 'border-zinc-800'
+            }`}
+          >
             <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">
               Recognized digit
             </p>
@@ -71,16 +70,14 @@ export default function Checker() {
               </p>
             ) : (
               <p className="text-zinc-700 text-sm py-6">
-                — draw something and click Recognize —
+                Draw something and click Recognize
               </p>
             )}
           </div>
-
         </div>
 
         {/* Right — config + model actions */}
         <div className="flex flex-col gap-4">
-
           {/* Config card */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
             <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">
@@ -90,12 +87,26 @@ export default function Checker() {
               {[
                 { label: 'Max epochs', key: 'epochs', step: '1' },
                 { label: 'Learning rate', key: 'lr', step: '0.01' },
-                { label: 'ES threshold', key: 'earlyStoppingThreshold', step: '0.0000001' },
-                { label: 'ES patience', key: 'earlyStoppingPatience', step: '1' },
-                { label: 'Progress interval', key: 'progressInterval', step: '100' },
+                {
+                  label: 'ES threshold',
+                  key: 'earlyStoppingThreshold',
+                  step: '0.0000001',
+                },
+                {
+                  label: 'ES patience',
+                  key: 'earlyStoppingPatience',
+                  step: '1',
+                },
+                {
+                  label: 'Progress interval',
+                  key: 'progressInterval',
+                  step: '100',
+                },
               ].map(({ label, key, step }) => (
                 <div className="flex items-center justify-between gap-4">
-                  <label className="text-sm text-zinc-300 whitespace-nowrap">{label}</label>
+                  <label className="text-sm text-zinc-300 whitespace-nowrap">
+                    {label}
+                  </label>
                   <input
                     className="w-36 px-3 py-1.5 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 text-right"
                     type="number"
@@ -125,7 +136,7 @@ export default function Checker() {
                 disabled={checkerState.isTraining}
                 onClick={onTrain}
               >
-                {checkerState.isTraining ? '⏳ Training…' : '🚀 Train Model'}
+                {checkerState.isTraining ? 'Training...' : 'Train Model'}
               </button>
               <button
                 className="px-4 py-2.5 bg-zinc-700 hover:bg-rose-700 border border-zinc-600 hover:border-rose-600 text-zinc-100 hover:text-white rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
@@ -157,12 +168,13 @@ export default function Checker() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-zinc-500 text-sm text-center">Initializing…</p>
+                  <p className="text-zinc-500 text-sm text-center">
+                    Initializing...
+                  </p>
                 )}
               </div>
             )}
           </div>
-
         </div>
       </div>
 
@@ -170,7 +182,6 @@ export default function Checker() {
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
         <Result result={result} onDelete={removeItem} onClearAll={clearAll} />
       </div>
-
     </div>
   );
 }

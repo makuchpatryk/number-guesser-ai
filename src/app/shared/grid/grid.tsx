@@ -12,33 +12,33 @@ export function Grid({ grid }: { grid: boolean[][] }) {
     grid[x][y] = value;
   }
   return (
-    <div className="select-none">
-      {grid.map((row, keyRow) => (
-        <div className="flex">
-          {row.map((col, keyCol) => (
-            <div
-              data-testid="grid-cell"
-              data-row={keyRow}
-              data-col={keyCol}
-              className={`w-[96px] h-[96px] m-[4px] rounded-lg border-2 cursor-crosshair transition-colors ${
-                col
-                  ? 'bg-[red] border-red-700'
-                  : 'bg-zinc-100 border-zinc-300 hover:bg-zinc-200'
-              }`}
-              onmouseenter={() => {
-                if (activeMouse !== null) {
-                  onGridClick(keyRow, keyCol, activeMouse);
-                }
-              }}
-              onmousedown={() => {
-                activeMouse = !grid[keyRow][keyCol];
+    <div className="select-none grid grid-cols-8 gap-1 w-full">
+      {grid.flat().map((col, index) => {
+        const keyRow = Math.floor(index / grid[0].length);
+        const keyCol = index % grid[0].length;
+        return (
+          <div
+            data-testid="grid-cell"
+            data-row={keyRow}
+            data-col={keyCol}
+            className={`aspect-square rounded-sm border cursor-crosshair transition-colors ${
+              col
+                ? 'bg-indigo-500 border-indigo-400'
+                : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'
+            }`}
+            onmouseenter={() => {
+              if (activeMouse !== null) {
                 onGridClick(keyRow, keyCol, activeMouse);
-              }}
-              onmouseup={() => { activeMouse = null; }}
-            />
-          ))}
-        </div>
-      ))}
+              }
+            }}
+            onmousedown={() => {
+              activeMouse = !grid[keyRow][keyCol];
+              onGridClick(keyRow, keyCol, activeMouse);
+            }}
+            onmouseup={() => { activeMouse = null; }}
+          />
+        );
+      })}
     </div>
   );
 }

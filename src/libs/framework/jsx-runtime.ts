@@ -25,6 +25,7 @@ export function createElement(
 
   // Append children to the element
   for (const child of children) {
+    if (child === false || child === null || child === undefined) continue;
     el.appendChild(
       child instanceof Node ? child : document.createTextNode(String(child)),
     );

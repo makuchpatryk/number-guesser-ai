@@ -2,9 +2,10 @@ import { reactive } from '../../libs/framework';
 import { localStorageAdapter } from '../../libs/storage';
 import { createRepository } from '../repository';
 import { ResultItem } from '../shared/models/result-item.model';
-import { getInitialGrid } from '../shared';
+import { getInitialGrid, result } from '../shared';
+import { SAMPLE_DATA } from './sample-data';
 
-const { update, save, get, remove, clear } = createRepository(localStorageAdapter);
+const { update, save, remove, clear } = createRepository(localStorageAdapter);
 
 export const trainState = reactive<{
   buttons: number[];
@@ -14,13 +15,7 @@ export const trainState = reactive<{
   grid: getInitialGrid(),
 });
 
-export const result = reactive<ResultItem[]>([]);
-
-// Async init — dane z localStorage wpadają DO reactive proxy
-(async () => {
-  const items = await get();
-  items.forEach((item) => result.push(item));
-})();
+export { result };
 
 export async function setTrain(num: number): Promise<void> {
   const newRow: ResultItem = {
@@ -46,3 +41,9 @@ export async function clearAll(): Promise<void> {
   await clear();
 }
 
+export async function loadSamples(): Promise<void> {
+  for (const item of SAMPLE_DATA) {
+    result.push(item);
+    await update(item);
+  }
+}

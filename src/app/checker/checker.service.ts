@@ -8,11 +8,11 @@ import {
   SerializedWeights,
 } from '../../libs/neural-network';
 import { createRepository } from '../repository';
-import { ResultItem } from '../shared/models/result-item.model';
 import { getInitialGrid } from '../shared';
+import { result } from '../shared/result-store';
 
 const { predict, setWeights } = neuralNetworkFactory();
-const { get, remove, clear } = createRepository(localStorageAdapter);
+const { remove, clear } = createRepository(localStorageAdapter);
 const weightsRepo = createWeightsRepository(localStorageAdapter);
 
 export const checkerState = reactive<{
@@ -29,12 +29,11 @@ export const checkerState = reactive<{
   trainingConfig: { ...defaultTrainingConfig },
 });
 
-export const result = reactive<ResultItem[]>([]);
+export { result };
 
-// Async init — załaduj dane treningowe i wagi z storage
+// Load saved weights on init
 (async () => {
-  const [items, savedWeights] = await Promise.all([get(), weightsRepo.loadWeights()]);
-  items.forEach((item) => result.push(item));
+  const savedWeights = await weightsRepo.loadWeights();
   if (savedWeights) {
     setWeights(savedWeights);
   }

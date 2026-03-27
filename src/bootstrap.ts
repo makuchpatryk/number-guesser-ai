@@ -1,4 +1,8 @@
 import App from './index.tsx';
 import { mount } from './libs/framework';
+import { initResultStore } from './app/shared';
 
-mount(App, document.getElementById('app')!);
+(async () => {
+  await initResultStore();
+  mount(App, document.getElementById('app')!);
+})();
